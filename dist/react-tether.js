@@ -83,7 +83,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
@@ -134,7 +134,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(TetherComponent, [{
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
-	      this._targetNode = _reactDom2['default'].findDOMNode(this);
+	      this._targetNode = _reactDom2['default'].findDOMNode(this.props.renderTarget ? this : this.getFirstChild());
 	      this._update();
 	    }
 	  }, {
@@ -146,6 +146,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'componentWillUnmount',
 	    value: function componentWillUnmount() {
 	      this._destroy();
+	    }
+	  }, {
+	    key: 'getFirstChild',
+	    value: function getFirstChild() {
+	      var children = this.props.children;
+
+	      var firstChild = null;
+
+	      // we use forEach because the second child could be null
+	      // causing children to not be an array
+	      _react.Children.forEach(children, function (child, index) {
+	        if (index === 0) {
+	          firstChild = child;
+	          return;
+	        }
+	      });
+
+	      return firstChild;
 	    }
 	  }, {
 	    key: 'disable',
@@ -240,20 +258,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      var children = this.props.children;
+	      var renderTarget = this.props.renderTarget;
 
-	      var firstChild = null;
-
-	      // we use forEach because the second child could be null
-	      // causing children to not be an array
-	      _react.Children.forEach(children, function (child, index) {
-	        if (index === 0) {
-	          firstChild = child;
-	          return;
-	        }
-	      });
-
-	      return firstChild;
+	      return renderTarget && this.getFirstChild();
 	    }
 	  }], [{
 	    key: 'propTypes',
@@ -261,6 +268,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      children: childrenPropType,
 	      renderElementTag: _react.PropTypes.string,
 	      renderElementTo: _react.PropTypes.any,
+	      renderTarget: _react.PropTypes.bool,
 	      attachment: _react.PropTypes.oneOf(attachmentPositions).isRequired,
 	      targetAttachment: _react.PropTypes.oneOf(attachmentPositions),
 	      offset: _react.PropTypes.string,
@@ -277,7 +285,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'defaultProps',
 	    value: {
 	      renderElementTag: 'div',
-	      renderElementTo: null
+	      renderElementTo: null,
+	      renderTarget: true
 	    },
 	    enumerable: true
 	  }]);

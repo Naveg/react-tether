@@ -28,6 +28,7 @@ class TetherComponent extends Component {
     children: childrenPropType,
     renderElementTag: PropTypes.string,
     renderElementTo: PropTypes.any,
+    renderTarget: PropTypes.bool,
     attachment: PropTypes.oneOf(attachmentPositions).isRequired,
     targetAttachment: PropTypes.oneOf(attachmentPositions),
     offset: PropTypes.string,
@@ -42,7 +43,8 @@ class TetherComponent extends Component {
 
   static defaultProps = {
     renderElementTag: 'div',
-    renderElementTo: null
+    renderElementTo: null,
+    renderTarget: true
   }
 
   _targetNode = null
@@ -50,7 +52,7 @@ class TetherComponent extends Component {
   _tether = false
 
   componentDidMount() {
-    this._targetNode = ReactDOM.findDOMNode(this)
+    this._targetNode = ReactDOM.findDOMNode(this.props.renderTarget ? this : this.getFirstChild())
     this._update()
   }
 
@@ -60,6 +62,22 @@ class TetherComponent extends Component {
 
   componentWillUnmount() {
     this._destroy()
+  }
+
+  getFirstChild() {
+    const { children } = this.props;
+    let firstChild = null
+
+    // we use forEach because the second child could be null
+    // causing children to not be an array
+    Children.forEach(children, (child, index) => {
+      if (index === 0) {
+        firstChild = child
+        return
+      }
+    })
+
+    return firstChild
   }
 
   disable() {
@@ -138,19 +156,8 @@ class TetherComponent extends Component {
   }
 
   render() {
-    const { children } = this.props
-    let firstChild = null
-    
-    // we use forEach because the second child could be null
-    // causing children to not be an array
-    Children.forEach(children, (child, index) => {
-      if (index === 0) {
-        firstChild = child
-        return
-      }
-    })
-
-    return firstChild
+    const { renderTarget } = this.props
+    return renderTarget && this.getFirstChild()
   }
 }
 
